@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lista de afazeres</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+        padding: 30px;
+      }
+
+      h3 {
+        text-align: center;
+        margin-bottom: 20px;
+        color: #fff;
+        font-size: 24px;
+        letter-spacing: 1px;
+      }
+
+      #app {
+        background-color: #fff;
+        padding: 25px;
+        border-radius: 15px;
+        box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.2);
+        width: 420px;
+        transition: 0.3s;
+      }
+
+      #app:hover {
+        transform: scale(1.01);
+      }
+
+      form p {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 15px;
+      }
+
+      input[type="text"] {
+        flex: 1;
+        padding: 10px 12px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        outline: none;
+        transition: all 0.3s ease;
+        font-size: 14px;
+      }
+
+      input[type="text"]:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 6px rgba(102, 126, 234, 0.6);
+      }
+
+      input[type="submit"] {
+        background: #667eea;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: 10px 15px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: bold;
+      }
+
+      input[type="submit"]:hover {
+        background: #5648c7;
+      }
+
+      ol {
+        list-style: none;
+        padding: 0;
+        margin: 15px 0;
+      }
+
+      .tarefa {
+        width: 95%;
+        padding: 12px;
+        background-color: #f8f9fc;
+        margin: 8px 0;
+        border-radius: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: all 0.3s;
+        font-size: 15px;
+        border: 1px solid #e0e0e0;
+      }
+
+      .tarefa:hover {
+        transform: translateX(5px);
+        background-color: #eef1f9;
+      }
+
+      .classImportante {
+        background-color: #c8e6c9 !important;
+        border: 1px solid #81c784 !important;
+      }
+
+      button {
+        background: #e53935;
+        color: #fff;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: 0.3s;
+        font-size: 13px;
+        font-weight: bold;
+      }
+
+      button:hover {
+        background: #c62828;
+      }
+
+      p {
+        margin: 5px 0;
+        font-weight: bold;
+        color: #444;
+      }
+
+      footer {
+        margin-top: auto;
+        padding: 15px;
+        text-align: center;
+        color: #fff;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <h3>Lista de tarefas</h3>
+    <div id="app">
+      <form v-on:submit.prevent="enviarFormulario">
+        <p>
+          Escreva: <input type="text" v-model="usuarioTarefa" required />
+          <input type="submit" value="Enviar" />
+        </p>
+      </form>
+      <ol>
+        <li
+          v-for="tarefa in tarefasPendetes"
+          v-on:click="tarefa.concluida = !tarefa.concluida"
+          v-bind:class="[{classImportante:tarefa.concluida }, 'tarefa']"
+          v-show="!tarefa.concluida"
+        >
+          <b>Nome:</b> {{tarefa.nomeTarefa}}
+          <b>Status:</b> {{pendenteRealizada(tarefa.concluida)}}
+          <button v-on:click="deletar(tarefa)">Deletar</button>
+        </li>
+      </ol>
+      <ol>
+        <li
+          v-for="tarefa in tarefasConcluidas"
+          v-on:click="tarefa.concluida = !tarefa.concluida"
+          v-bind:class="[{classImportante:tarefa.concluida }, 'tarefa']"
+          v-show="tarefa.concluida"
+        >
+         <b>Nome:</b> {{tarefa.nomeTarefa}}
+        <b>Status:</b>{{pendenteRealizada(tarefa.concluida)}}
+          <button v-on:click="deletar(tarefa)">Deletar</button>
+        </li>
+      </ol>
+      <p>Todas tarefas: {{totalTarefas}}</p>
+      <p>Todas tarefas pendentes: {{totalTarefasPendentes}}</p>
+      <p>Todas tarefas concluídas: {{totalTarefasConcluidas}}</p>
+    </div>
+
+    <footer>Feito por Davi Asaf</footer>
+
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script>
+      const app = Vue.createApp({
+        template: ``,
+
+        data() {
+          return {
+            usuarioTarefa: "",
+            todasTarefas: [],
+          };
+        },
+        methods: {
+          enviarFormulario() {
+            let item = {
+              nomeTarefa: this.usuarioTarefa,
+              concluida: false,
+            };
+            this.todasTarefas.push(item);
+            this.usuarioTarefa = "";
+          },
+          pendenteRealizada(tarefa) {
+            return tarefa ? `Concluída!` : `Pendente!`;
+          },
+          deletar(tarefa) {
+            let indiceTarefa = this.todasTarefas.findIndex(
+              (tarefaEncontrada) => tarefaEncontrada === tarefa
+            );
+            if (indiceTarefa !== -1) {
+              this.todasTarefas.splice(indiceTarefa, 1);
+            }
+          },
+        },
+        computed: {
+          totalTarefas() {
+            return this.todasTarefas.length;
+          },
+          totalTarefasPendentes() {
+            return this.todasTarefas.filter((tarefa) => !tarefa.concluida)
+              .length;
+          },
+          totalTarefasConcluidas() {
+            return this.todasTarefas.filter((tarefa) => tarefa.concluida)
+              .length;
+          },
+          tarefasPendetes() {
+            return this.todasTarefas.filter((tarefa) => !tarefa.concluida);
+          },
+          tarefasConcluidas() {
+            return this.todasTarefas.filter((tarefa) => tarefa.concluida);
+          },
+        },
+      });
+      app.mount("#app");
+    </script>
+  </body>
+</html>
