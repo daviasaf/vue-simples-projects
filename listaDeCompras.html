@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lista de Compras</title>
+    <style>
+      *{
+        font-size: 1.05em;
+      }
+      li{
+        display: flex;
+        align-items: center;
+        width: 200px;
+        height: 40px;
+        justify-content: center;
+        border-radius: 5px;
+        background-color: rgb(172, 172, 233);
+        transition: 0.3s;
+        margin: 20px 0;
+      }
+      li:hover{
+        background-color: rgb(130, 130, 174);
+      }
+      .impClass{
+        background-color: rgb(149, 203, 149);
+        text-decoration: line-through;
+      }
+      .impClass:hover{
+        background-color: rgb(124, 180, 124);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <!--* v-on pega o evento submit e não deixa enviar -->
+      <form v-on:submit.prevent="adicionarItem">
+        <!--* usa o v-model para ter um valor dinâmico no input e os dados -->
+        <p>Nome <input type="text" v-model="nomeProduto" required /></p>
+        <p>Preço <input type="text" v-model="precoProduto" required/></p>
+        <!--* envia o evento submit, no qual o form pega -->
+        <button type="submit">Enviar</button>
+      </form>
+      <div>
+        <ul>
+          <p>Para comprar</p>
+          <!-- Usa o for e retorna cada item do array itens -->
+          <!-- quando clicado, troca o valor do item marcado -->
+          <!-- de true, vai para false -->
+          <!-- Então, o v-show recebe um valor booleano para aparecer ou não -->
+          <li
+            v-for="item in itens"
+            v-on:click="item.marcado = !item.marcado"
+            v-show="!item.marcado"
+            >
+            {{item.nome}}, {{item.preco}}
+          </li>
+        </ul>
+        <ul>
+          <p>Comprado</p>
+          <!-- Mesma coisa aqui -->
+          <li 
+            v-for="item in itens"
+            v-bind:class="{impClass: item.marcado}"
+            v-on:click="item.marcado = !item.marcado"
+            v-show="item.marcado"
+            >
+            {{item.nome}}, {{item.preco}}
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script>
+      const app = Vue.createApp({
+        data() {
+          return {
+            nomeProduto: null,
+            precoProduto: null,
+            itens: [{ nome: "Camisa", preco: 100, marcado: false }],
+          };
+        },
+        methods: {
+          adicionarItem() {
+            let item = {
+              nome: this.nomeProduto,
+              preco: this.precoProduto,
+              marcado: false,
+            };
+            this.itens.push(item);
+            this.nomeProduto = null
+            this.precoProduto = null
+          },
+        },
+      });
+      app.mount("#app");
+    </script>
+  </body>
+</html>
